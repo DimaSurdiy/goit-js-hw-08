@@ -1,51 +1,36 @@
-import throttle from 'lodash.throttle';
+import { throttle } from 'lodash';
 
-const formEl = document.querySelector('.feedback-form');
-const inputEl = document.querySelector('.feedback-form input');
-const textareaEl = document.querySelector('.feedback-form textarea');
+const form = document.querySelector('.feedback-form');
+const emailEl = document.querySelector('.feedback-form input');
+const messageEl = document.querySelector('.feedback-form textarea');
 
 const LOCALSTORAGE_KEY = 'feedback-form-state';
-const storage = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY));
+const formData = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY));
 
-formEl.addEventListener('input', onFormInput);
-formEl.addEventListener('submit', onFormSubmit);
+form.addEventListener('input', throttle(onFormInput, 500));
+form.addEventListener('submit', onFormSubmit);
 
-if (localStorage.getItem(LOCALSTORAGE_KEY) !== null) {
-  checkLocaleStorage(storage);
+setFormElementsValuesFromLocalStorageData(formData);
+
+function setFormElementsValuesFromLocalStorageData(data) {
+  if (data) {
+    emailEl.value = data.email;
+    messageEl.value = data.message;
+  }
 }
 
-function onFormInput(event) {
-  const {
-    elements: { email, message },
-  } = event.currentTarget;
-
-  const inputsValueObj = {
-    email: email.value,
-    message: message.value,
-  };
-
-  localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(inputsValueObj));
+function onFormInput() {
+  localStorage.setItem(
+    LOCALSTORAGE_KEY,
+    JSON.stringify({ email: emailEl.value, message: messageEl.value }),
+  );
 }
 
-function onFormSubmit(event) {
-  event.preventDefault();
+function onFormSubmit(evt) {
+  evt.preventDefault();
 
-  const {
-    elements: { email, message },
-  } = event.currentTarget;
+  console.log(formData);
 
-  const formSubmitObj = {
-    email: email.value,
-    message: message.value,
-  };
-
-  console.log(formSubmitObj);
-
-  event.currentTarget.reset();
-  localStorage.clear();
-}
-
-function checkLocaleStorage({ email, message }) {
-  inputEl.value = email;
-  textareaEl.value = message;
+  form.reset();
+  localStorage.removeItem(LOCALSTORAGE_KEY);
 }

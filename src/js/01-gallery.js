@@ -1,29 +1,24 @@
-import { galleryItems } from './gallery-items';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
+import { galleryItems } from './gallery-items';
+import galleryItemTpl from '../templates/galleryItem.hbs';
+
 const galleryEl = document.querySelector('.gallery');
+const markup = galleryItemTpl(galleryItems);
 
-createGalleryItemsMarkup();
+galleryEl.insertAdjacentHTML('beforeend', markup);
+galleryEl.addEventListener('click', onGalleryClick);
 
-galleryEl.addEventListener('click', onGalleryItemsClick);
+var lightbox = new SimpleLightbox('.gallery a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
 
-function createGalleryItemsMarkup() {
-  const galleryMarkup = galleryItems
-    .map(({ preview, original, description }) => {
-      return `
-        <a class="gallery__item" href="${original}">
-          <img class="gallery__image" src="${preview}" alt="${description}" title="${description}" />
-        </a>
-    `;
-    })
-    .join('');
+function onGalleryClick(e) {
+  e.preventDefault();
 
-  galleryEl.innerHTML = galleryMarkup;
-}
-
-function onGalleryItemsClick(event) {
-  event.preventDefault();
-
-  var lightbox = new SimpleLightbox('.gallery a');
+  if (!e.target.classList.contains('gallery__image')) {
+    return;
+  }
 }
